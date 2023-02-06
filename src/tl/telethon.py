@@ -23,9 +23,6 @@ class CustomInitConnectionRequest(functions.InitConnectionRequest):
                  lang_pack: str, lang_code: str, query, proxy: TypeInputClientProxy = None,
                  params: TypeJSONValue = None):
         # our hook pass pid as device_model
-        super().__init__(api_id, device_model, system_version, app_version, system_lang_code, lang_pack, lang_code,
-                         query, proxy, params)
-
         data = APIData.findData(device_model)  # type: ignore
         if data is not None:
             self.api_id = data.api_id
@@ -296,8 +293,6 @@ class TelegramClient(telethon.TelegramClient, BaseObject):
     def __init__(self, session: Union[str, Session] = None, api: Union[Type[APIData], APIData] = None, api_id: int = 0,
                  api_hash: str = None, **kwargs):
         # Use API.TelegramDesktop by default.
-
-        super().__init__(session, api_id, api_hash)
         if api is not None:
             if isinstance(api, APIData) or (
                 isinstance(api, type)
