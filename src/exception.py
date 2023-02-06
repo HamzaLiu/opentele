@@ -7,12 +7,12 @@ from PyQt5.QtCore import QDataStream
 
 class OpenTeleException(BaseException):  # nocov
     """
-    Base exception of the library.
+    Base exception to the library.
     """
 
     def __init__(self, message: str = None, stack_index: int = 1) -> None:
 
-        super().__init__(message if (message != None) else "")
+        super().__init__(message if (message is not None) else "")
 
         self.message = message
         self.desc = self.__class__.__name__
@@ -44,11 +44,11 @@ class OpenTeleException(BaseException):  # nocov
     def __str__(self):
         reason = self.desc.__str__()
 
-        if self.message != None:
+        if self.message is not None:
             reason += f": {self.message}"
 
         reason += " [ Called by "
-        if self._caller_class != None:
+        if self._caller_class is not None:
 
             parent_list = []
             base = self._caller_class
@@ -216,12 +216,12 @@ class NoInstanceMatched(OpenTeleException):
 
 @typing.overload
 def Expects(
-    condition: bool,
-    message: str = None,
-    done: typing.Callable[[], None] = None,
-    fail: typing.Callable[[OpenTeleException], None] = None,
-    silent: bool = False,
-    stack_index: int = 1,
+        condition: bool,
+        message: str = None,
+        done: typing.Callable[[], None] = None,
+        fail: typing.Callable[[OpenTeleException], None] = None,
+        silent: bool = False,
+        stack_index: int = 1,
 ) -> bool:
     """Expect a condition to be `True`, raise an `OpenTeleException` if it's not.
 
@@ -251,14 +251,13 @@ def Expects(
 
 @typing.overload
 def Expects(
-    condition: bool,
-    exception: OpenTeleException = None,
-    done: typing.Callable[[], None] = None,
-    fail: typing.Callable[[OpenTeleException], None] = None,
-    silent: bool = False,
-    stack_index: int = 1,
+        condition: bool,
+        exception: OpenTeleException = None,
+        done: typing.Callable[[], None] = None,
+        fail: typing.Callable[[OpenTeleException], None] = None,
+        silent: bool = False,
+        stack_index: int = 1,
 ) -> bool:
-
     """Expect a condition to be `True`, raise an `OpenTeleException` if it's not.
 
     ### Arguments:
@@ -286,31 +285,31 @@ def Expects(
 
 
 def Expects(
-    condition: bool,
-    exception: typing.Union[OpenTeleException, str] = None,
-    done: typing.Callable[[], None] = None,
-    fail: typing.Callable[[OpenTeleException], None] = None,
-    silent: bool = False,
-    stack_index: int = 1,
+        condition: bool,
+        exception: typing.Union[OpenTeleException, str] = None,
+        done: typing.Callable[[], None] = None,
+        fail: typing.Callable[[OpenTeleException], None] = None,
+        silent: bool = False,
+        stack_index: int = 1,
 ) -> bool:  # nocov
 
     if condition:
-        if done != None:
+        if done is not None:
             done()
         return condition
 
     if isinstance(exception, str):
         exception = OpenTeleException(exception, 2)
 
-    elif exception != None and not isinstance(exception, OpenTeleException):
+    elif exception is not None and not isinstance(exception, OpenTeleException):
         raise OpenTeleException("No instance of Expects() match the arguments given", 2)
 
-    if exception == None:
+    if exception is None:
         exception = OpenTeleException("Unexpected error", 2)
 
     # no raise exception
     if silent:
-        if fail != None:
+        if fail is not None:
             fail(exception)
         return condition
 
@@ -320,7 +319,7 @@ def Expects(
         tb = types.TracebackType(None, frame, frame.f_lasti, frame.f_lineno)  # type: ignore
         exception = exception.with_traceback(tb)
 
-        if fail != None:
+        if fail is not None:
             fail(exception)
 
         raise exception
@@ -328,7 +327,7 @@ def Expects(
 
 def ExpectStreamStatus(stream: QDataStream, message: str = "Could not stream data"):
     Expects(
-        stream.status() == QDataStream.Status.Ok,
+        stream.status() == QDataStream.Ok,
         stack_index=2,
         exception=QDataStreamFailed(
             "Could not read keys count from mtp authorization.", stack_index=2

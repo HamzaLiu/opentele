@@ -212,6 +212,9 @@ class MapData(BaseObject):  # nocov
 
             else:
                 logging.warning(f"Unknown key type in encrypted map: {keyType}")
+                raise TDataReadMapDataFailed(
+                    f"Unknown key type in encrypted map: {keyType}"
+                )
 
             ExpectStreamStatus(map.stream, "Could not stream data from mapData ")
 
@@ -809,7 +812,7 @@ class Account(BaseObject):
             self.__MainDcId = DcId(stream.readInt32())
 
         Expects(
-            stream.status() == QDataStream.Status.Ok,
+            stream.status() == QDataStream.Ok,
             QDataStreamFailed("Could not read main fields from mtp authorization."),
         )
 
@@ -817,7 +820,7 @@ class Account(BaseObject):
 
             key_count = stream.readInt32()
             Expects(
-                stream.status() == QDataStream.Status.Ok,
+                stream.status() == QDataStream.Ok,
                 QDataStreamFailed("Could not read keys count from mtp authorization."),
             )
 
@@ -986,6 +989,7 @@ class Account(BaseObject):
         api: Union[Type[APIData], APIData] = API.TelegramDesktop,
         password: str = None,
         owner: td.TDesktop = None,
+        **kwargs,
     ):
 
         Expects(
@@ -1009,7 +1013,7 @@ class Account(BaseObject):
                     ),
                 )
 
-            copy = await telethonClient.QRLoginToNewClient(api=api, password=password)
+            copy = await telethonClient.QRLoginToNewClient(api=api, password=password, **kwargs)
             await copy.get_me()
         else:
             copy = telethonClient
